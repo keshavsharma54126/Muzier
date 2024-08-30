@@ -16,6 +16,7 @@ export default function Navbar() {
   const router = useRouter();
 
   const handleSignOut = async () => {
+    router.push("/");
     await signOut({ callbackUrl: "/" });
   };
 
@@ -48,7 +49,7 @@ export default function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link href="/dashboard">Dashboard</Link>
+                  <Link href="/appview">Dashboard</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleSignOut}>
                   Logout
@@ -60,7 +61,7 @@ export default function Navbar() {
               variant="secondary"
               asChild
               className="bg-white/20 hover:bg-white/30 text-white border-2 border-white/50 font-bold">
-              <Link href="/api/auth/signin">Signin/Signup</Link>
+              <Link href="/signin">Signin/Signup</Link>
             </Button>
           )}
         </div>

@@ -2,8 +2,6 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import GoogleProvider from "next-auth/providers/google";
-import EmailProvider from "next-auth/providers/email";
-import { signIn } from "next-auth/react";
 import db from "@/lib/db";
 import { Role } from "@prisma/client";
 
@@ -112,7 +110,7 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async redirect() {
-      return "/";
+      return "/appview";
     },
   },
 };

@@ -18,6 +18,7 @@ model User {
   password      String?
   googleId      String?        @unique
   name          String?
+  imageUrl      String?
   role          Role
   streams       Stream[]
   upvotes       Upvote[]
@@ -44,6 +45,7 @@ model Upvote{
 enum Role{
   Streamer
   EndUser
+  Admin
 }
 
 enum StreamType{

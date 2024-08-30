@@ -13,7 +13,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  id            String          @id @default(uuid())
+  email         String          @unique
+  password      String?
+  googleId      String?        @unique
+  name          String?
+  role          Role
+  streams       Stream[]
+  upvotes       Upvote[]
+}
+
+model Stream{
+  id            String          @id @default(uuid())
+  type          StreamType
+  active        Boolean         @default(true)
+  upvotes       Upvote[]
+  userId        String
+  user          User            @relation(fields: [userId],references: [id])
+}
+
+model Upvote{
+  id            String          @id @default(uuid())
+  userId        String
+  streamId      String
+  user          User            @relation(fields: [userId],references: [id])
+  stream        Stream          @relation(fields: [streamId],references: [id])
+
+}
+
+enum Role{
+  Streamer
+  EndUser
+}
+
+enum StreamType{
+  Spotify
+  Youtube
 }

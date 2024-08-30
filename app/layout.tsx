@@ -24,7 +24,7 @@ export default function RootLayout({
       <body
         className={`${inter.className} flex flex-col min-h-screen bg-black`}>
         <SessionProvider>
-          <div className="fixed inset-0 z-0 bg-black">
+          <div className="fixed inset-0 z-0 ">
             <div className="absolute inset-0 bg-gradient-to-br from-purple-950  to-black"></div>
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 viewBox=%220 0 80 80%22 width=%2280%22 height=%2280%22%3E%3Ccircle cx=%2240%22 cy=%2240%22 r=%2236%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%221%22 stroke-opacity=%22.1%22%3E%3C%2Fcircle%3E%3C%2Fsvg%3E')] bg-repeat opacity-10"></div>
             <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black"></div>

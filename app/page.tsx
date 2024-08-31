@@ -17,32 +17,32 @@ export default function Home() {
       </div>
 
       <main className="relative z-10">
-        <section className="min-h-screen flex items-center justify-center">
+        <section className="min-h-screen flex items-center justify-center px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
-            className="text-center">
-            <h1 className="text-7xl font-bold mb-6 leading-tight text-white">
+            className="text-center w-full max-w-4xl">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 leading-tight text-white">
               Streaming With Music,
-              <br />
+              <br className="hidden sm:inline" />
               Reimagined.
             </h1>
-            <p className="text-xl font-bold text-white/80 mb-12 max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl font-bold text-white/80 mb-8 sm:mb-12 max-w-2xl mx-auto">
               Muzer brings a new dimension to music streaming, allowing
               listeners to shape the playlist in real-time.
             </p>
-            <div className="flex justify-center space-x-6">
+            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
               <Button
                 asChild
                 variant="secondary"
-                className="bg-white/20 hover:bg-white/30 text-white border-2 border-white/50 text-lg px-8 py-6 rounded-full transition duration-300 transform hover:scale-105 font-bold">
+                className="bg-white/20 hover:bg-white/30 text-white border-2 border-white/50 text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 rounded-full transition duration-300 transform hover:scale-105 font-bold w-full sm:w-auto">
                 <Link href="/appview">Create a Room</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className="bg-black/20 hover:bg-black/30 text-white border-2 border-white/50 text-lg px-8 py-6 rounded-full transition duration-300 transform hover:scale-105 font-bold">
+                className="bg-black/20 hover:bg-black/30 text-white border-2 border-white/50 text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 rounded-full transition duration-300 transform hover:scale-105 font-bold w-full sm:w-auto">
                 <Link href="/appview">Join a Room</Link>
               </Button>
             </div>

@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FaMusic, FaUser, FaCog } from "react-icons/fa";
+import { FaMusic, FaUsers, FaDoorOpen } from "react-icons/fa";
+import { MdLibraryMusic, MdGroupAdd, MdLogin } from "react-icons/md";
 
 const Appview = () => {
   const { data: session, status } = useSession();
@@ -29,14 +30,11 @@ const Appview = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen overflow-auto">
+    <div className="flex flex-col min-h-screen overflow-hiddebn">
       <div className="flex-grow container mx-auto px-4 py-8 text-white ">
         <h1 className="mt-16 text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
-          Welcome to the Funky Dark App
+          Hi {session.user?.name || "Unknown User"}, Welcome to Muzier
         </h1>
-        <p className="text-xl mb-8">
-          You are logged in as: {session.user?.name || "Unknown User"}
-        </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card className="bg-purple-800/30 border-purple-600 text-white">
@@ -48,7 +46,7 @@ const Appview = () => {
             <CardContent>
               <p>Explore your favorite tracks and playlists.</p>
               <Button className="mt-4 bg-purple-600 hover:bg-purple-700">
-                Go to Library
+                <MdLibraryMusic className="mr-2" /> Go to Library
               </Button>
             </CardContent>
           </Card>
@@ -56,13 +54,14 @@ const Appview = () => {
           <Card className="bg-purple-800/30 border-purple-600 text-white">
             <CardHeader>
               <CardTitle className="flex items-center">
-                <FaUser className="mr-2" /> Profile
+                <FaUsers className="mr-2" />
+                Create a Room
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p>View and edit your profile information.</p>
+              <p>Create a room and share it with your viewers or friends</p>
               <Button className="mt-4 bg-purple-600 hover:bg-purple-700">
-                Edit Profile
+                <MdGroupAdd className="mr-2" /> Create Room
               </Button>
             </CardContent>
           </Card>
@@ -70,13 +69,14 @@ const Appview = () => {
           <Card className="bg-purple-800/30 border-purple-600 text-white">
             <CardHeader>
               <CardTitle className="flex items-center">
-                <FaCog className="mr-2" /> Settings
+                <FaDoorOpen className="mr-2" />
+                Join An Active Room
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Customize your app experience.</p>
+              <p>Join the music room of your favorite creator or friends</p>
               <Button className="mt-4 bg-purple-600 hover:bg-purple-700">
-                Open Settings
+                <MdLogin className="mr-2" /> Join Room
               </Button>
             </CardContent>
           </Card>

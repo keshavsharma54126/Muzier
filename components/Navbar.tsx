@@ -34,28 +34,51 @@ export default function Navbar() {
         <Link href="/" className="text-2xl font-bold text-white">
           Muzer
         </Link>
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-6 ">
           {session?.user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="focus:outline-none">
-                <div className="w-10 h-10 rounded-full overflow-hidden">
-                  <Avatar>
-                    <AvatarImage src={session.user.image || undefined} />
-                    <AvatarFallback>
-                      {getInitials(session.user.name || "")}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href="/appview">Dashboard</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSignOut}>
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="">
+              <DropdownMenu>
+                <DropdownMenuTrigger className="focus:outline-none">
+                  <div className="w-10 h-10 rounded-full overflow-hidden">
+                    <Avatar>
+                      <AvatarImage src={session.user.image || undefined} />
+                      <AvatarFallback>
+                        {getInitials(session.user.name || "")}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="mt-1">
+                  <DropdownMenuItem asChild>
+                    <div className="bg-green-100 text-green-500 hover:text-green-800">
+                      <Link href="/appview">Dashboard</Link>
+                    </div>
+                  </DropdownMenuItem>
+                  <div className="bg-red-100 hover:bg-red-200">
+                    <DropdownMenuItem onClick={handleSignOut}>
+                      <div className="flex">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="size-6 text-red-500">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
+                          />
+                        </svg>
+                        <div className="text-red-500 hover:text-red-800">
+                          Logout
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           ) : (
             <Button
               variant="secondary"

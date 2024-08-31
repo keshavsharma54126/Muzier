@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Stream" ALTER COLUMN "active" DROP NOT NULL,
+ALTER COLUMN "updatedAt" DROP NOT NULL;

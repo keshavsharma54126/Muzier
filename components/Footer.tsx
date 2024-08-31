@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="bg-black/10 dark:bg-black/30 py-4 relative z-10 backdrop-blur-md">
       <div className="container mx-auto px-6 flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold text-white">
-          Muzer
+          Muzify
         </Link>
         <div className="flex items-center space-x-6">
           <Button

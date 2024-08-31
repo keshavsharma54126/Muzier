@@ -32,7 +32,7 @@ export default function Navbar() {
     <nav className="fixed w-full bg-black/30 backdrop-blur-md z-50">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold text-white">
-          Muzer
+          Muzify
         </Link>
         <div className="flex items-center space-x-6 ">
           {session?.user ? (

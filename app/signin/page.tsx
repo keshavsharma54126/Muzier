@@ -16,8 +16,12 @@ export default function SignIn() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === "" || password === "" || password.length < 8) {
-      setError("Invalid Phone number or Password");
+    if (email === "" || password === "") {
+      setError("Email or password can not be empty");
+      return;
+    }
+    if (password.length < 8) {
+      setError("password can not be less than 8 characters");
       return;
     }
     try {
@@ -41,7 +45,7 @@ export default function SignIn() {
     <div className="min-h-screen flex px-4 sm:px-6 items-center justify-center bg-gradient-to-br from-purple-900 via-black to-purple-800">
       <div className="bg-gray-900 p-8  rounded-lg shadow-2xl w-full max-w-md border border-purple-500">
         <h2 className="text-3xl font-bold text-center text-purple-300 mb-8">
-          Welcome to Muzer
+          Welcome to Muzify
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">

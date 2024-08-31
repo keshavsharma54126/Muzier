@@ -3,7 +3,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import GoogleProvider from "next-auth/providers/google";
 import db from "@/lib/db";
-import { Role } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -49,7 +48,6 @@ export const authOptions: NextAuthOptions = {
               name: "Guest",
               email: credentials.email,
               password: hashedPassword,
-              role: Role.EndUser,
             },
           });
 
@@ -57,7 +55,6 @@ export const authOptions: NextAuthOptions = {
             id: newUser.id,
             name: newUser.name,
             email: newUser.email,
-            role: newUser.role,
           };
         } catch (error) {
           console.error("Error creating user:", error);
@@ -98,7 +95,6 @@ export const authOptions: NextAuthOptions = {
               email: profile.email,
               googleId: account.providerAccountId,
               imageUrl: profile.picture,
-              role: Role.EndUser,
             },
           });
           return true;

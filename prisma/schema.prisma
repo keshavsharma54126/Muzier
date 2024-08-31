@@ -19,18 +19,22 @@ model User {
   googleId      String?        @unique
   name          String?
   imageUrl      String?
-  role          Role
   streams       Stream[]
   upvotes       Upvote[]
 }
 
 model Stream{
   id            String          @id @default(uuid())
-  type          StreamType
-  active        Boolean         @default(true)
+  name          String
+  code          String? 
+  roomtype      RoomType    
+  type          StreamType?
+  active        Boolean?         @default(true)
   upvotes       Upvote[]
   userId        String
   user          User            @relation(fields: [userId],references: [id])
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime?       
 }
 
 model Upvote{
@@ -42,13 +46,14 @@ model Upvote{
 
 }
 
-enum Role{
-  Streamer
-  EndUser
-  Admin
-}
+
 
 enum StreamType{
   Spotify
   Youtube
+}
+
+enum RoomType{
+  public
+  private
 }

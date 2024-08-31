@@ -29,7 +29,7 @@ export default function Home() {
               Reimagined.
             </h1>
             <p className="text-lg sm:text-xl font-bold text-white/80 mb-8 sm:mb-12 max-w-2xl mx-auto">
-              Muzer brings a new dimension to music streaming, allowing
+              Muzify brings a new dimension to music streaming, allowing
               listeners to shape the playlist in real-time.
             </p>
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
@@ -111,7 +111,7 @@ export default function Home() {
               asChild
               variant="secondary"
               className="bg-white/20 hover:bg-white/30 text-white border-2 border-white/50 text-lg px-8 py-6 rounded-full transition duration-300 transform hover:scale-105 font-bold">
-              <Link href="/signup">Sign Up Now</Link>
+              <Link href="/signin">Sign Up Now</Link>
             </Button>
           </div>
         </section>

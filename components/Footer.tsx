@@ -32,7 +32,7 @@ export default function Footer() {
             variant="secondary"
             asChild
             className="bg-white/20 hover:bg-white/30 text-white border-2 border-white/50 font-bold">
-            <Link href="/contact">Contact Us</Link>
+            <Link href="">Contact Us</Link>
           </Button>
         </div>
       </div>

@@ -83,7 +83,7 @@ const Appview = () => {
         </div>
 
         <div className="mt-12 p-6 bg-gradient-to-r from-purple-700 to-pink-600 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-bold mb-4">What's New</h2>
+          <h2 className="text-2xl font-bold mb-4">What&apos;s New</h2>
           <p className="mb-4">Check out our latest features and updates!</p>
           <Button
             variant="secondary"

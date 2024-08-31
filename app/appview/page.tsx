@@ -30,7 +30,7 @@ const Appview = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen overflow-hiddebn">
+    <div className="flex flex-col min-h-screen overflow-hiddebn max-w-screen">
       <div className="flex-grow container mx-auto px-4 py-8 text-white ">
         <h1 className="mt-16 text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
           Hi {session.user?.name || "Unknown User"}, Welcome to Muzier

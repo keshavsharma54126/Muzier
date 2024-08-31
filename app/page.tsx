@@ -37,13 +37,13 @@ export default function Home() {
                 asChild
                 variant="secondary"
                 className="bg-white/20 hover:bg-white/30 text-white border-2 border-white/50 text-lg px-8 py-6 rounded-full transition duration-300 transform hover:scale-105 font-bold">
-                <Link href="/create-room">Create a Room</Link>
+                <Link href="/appview">Create a Room</Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
                 className="bg-black/20 hover:bg-black/30 text-white border-2 border-white/50 text-lg px-8 py-6 rounded-full transition duration-300 transform hover:scale-105 font-bold">
-                <Link href="/join-room">Join a Room</Link>
+                <Link href="/appview">Join a Room</Link>
               </Button>
             </div>
           </motion.div>

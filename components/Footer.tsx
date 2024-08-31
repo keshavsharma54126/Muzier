@@ -24,7 +24,7 @@ export default function Footer() {
             size="icon"
             asChild
             className="text-white hover:text-yellow-400 transition-colors duration-200">
-            <Link href="https://twitter.com/yourusername">
+            <Link href="https://x.com/BasedDesiMan">
               <FaTwitter className="h-5 w-5" />
             </Link>
           </Button>

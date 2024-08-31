@@ -24,7 +24,7 @@ export default function Home() {
             transition={{ duration: 1 }}
             className="text-center">
             <h1 className="text-7xl font-bold mb-6 leading-tight text-white">
-              Music Voting,
+              Streaming With Music,
               <br />
               Reimagined.
             </h1>

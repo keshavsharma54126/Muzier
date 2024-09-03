@@ -1,7 +1,7 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -14,6 +14,8 @@ import {
 } from "react-icons/md";
 import { CreateRoomModal } from "@/components/CreateRoomModal";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { EnterRoomModal } from "@/components/EnterRoomModal";
 
 interface Room {
   id: string;
@@ -24,16 +26,17 @@ interface Room {
 
 const Appview = () => {
   const { data: session, status } = useSession();
+  const [myrooms, setMYrooms] = useState<Room[]>([]);
   const router = useRouter();
 
   // Dummy data for My Rooms
-  const myRooms: Room[] = [
-    { id: "1", name: "My Rock Room", roomtype: "public" },
-    { id: "2", name: "Jazz Nights", roomtype: "private" },
-    { id: "3", name: "Classical Sundays", roomtype: "public" },
-    { id: "4", name: "Pop Playlist", roomtype: "public" },
-    { id: "5", name: "Indie Jams", roomtype: "private" },
-  ];
+  // const myRooms: Room[] = [
+  //   { id: "1", name: "My Rock Room", roomtype: "public" },
+  //   { id: "2", name: "Jazz Nights", roomtype: "private" },
+  //   { id: "3", name: "Classical Sundays", roomtype: "public" },
+  //   { id: "4", name: "Pop Playlist", roomtype: "public" },
+  //   { id: "5", name: "Indie Jams", roomtype: "private" },
+  // ];
 
   // Dummy data for Trending Rooms
   const trendingRooms: Room[] = [
@@ -47,12 +50,27 @@ const Appview = () => {
   const handleRoomClick = (roomId: string) => {
     router.push(`/room/${roomId}`);
   };
+  //@ts-ignore
+  const userId = session?.user?.id;
+
+  const getRooms = async () => {
+    try {
+      const res = await axios.get("/api/getRooms", {
+        params: { userId },
+      });
+
+      setMYrooms(res.data.rooms);
+    } catch (e) {
+      console.error("error while fetching rooms for user ", e);
+    }
+  };
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/signin");
     }
-  }, [status, router]);
+    getRooms();
+  }, [status, router, userId]);
 
   if (status === "loading") {
     return (
@@ -110,9 +128,7 @@ const Appview = () => {
             </CardHeader>
             <CardContent>
               <p>Join the music room of your favorite creator or friends</p>
-              <Button className="mt-4 bg-purple-600 hover:bg-purple-700">
-                <MdLogin className="mr-2" /> Join Room
-              </Button>
+              <EnterRoomModal />
             </CardContent>
           </Card>
         </div>
@@ -126,8 +142,8 @@ const Appview = () => {
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[300px] w-full rounded-md border border-purple-800 p-4">
-                {myRooms.map((room, index) => (
-                  <div key={room.id}>
+                {myrooms?.map((room, index) => (
+                  <div key={room?.id}>
                     <div
                       className="flex items-center justify-between py-2 px-2 hover:bg-purple-800/30 rounded-md cursor-pointer transition-colors"
                       onClick={() => handleRoomClick(room.id)}>
@@ -138,7 +154,7 @@ const Appview = () => {
                         {room.roomtype}
                       </span>
                     </div>
-                    {index < myRooms.length - 1 && (
+                    {index < myrooms.length - 1 && (
                       <Separator className="my-2 bg-purple-800" />
                     )}
                   </div>

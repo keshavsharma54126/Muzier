@@ -26,7 +26,7 @@ export async function POST(req: Request) {
         name: roomName,
         roomtype: roomType,
         code: uuidv4(),
-        userId: userId,
+        userId,
         createdAt: new Date(),
         updatedAt: new Date(),
       },

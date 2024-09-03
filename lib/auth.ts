@@ -68,13 +68,22 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET || "secret",
-  //   pages: {
-  //     signIn: "/signin",
-  //   },
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
     async session({ session, token }: any) {
       if (token && session.user) {
-        session.user.id = token.sub;
+        const dbUser = await db.user.findUnique({
+          where: { email: session.user.email },
+        });
+
+        if (dbUser) {
+          session.user.id = dbUser.id;
+        }
       }
       return session;
     },
@@ -82,14 +91,20 @@ export const authOptions: NextAuthOptions = {
       if (account.provider === "google") {
         const existingUser = await db.user.findUnique({
           where: {
-            googleId: account.providerAccountId,
+            email: profile.email,
           },
         });
         if (existingUser) {
+          if (!existingUser.googleId) {
+            await db.user.update({
+              where: { id: existingUser.id },
+              data: { googleId: account.providerAccountId },
+            });
+          }
           return true;
         }
         try {
-          await db.user.create({
+          const newUser = await db.user.create({
             data: {
               name: profile.name,
               email: profile.email,

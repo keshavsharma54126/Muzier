@@ -29,16 +29,6 @@ const Appview = () => {
   const [myrooms, setMYrooms] = useState<Room[]>([]);
   const router = useRouter();
 
-  // Dummy data for My Rooms
-  // const myRooms: Room[] = [
-  //   { id: "1", name: "My Rock Room", roomtype: "public" },
-  //   { id: "2", name: "Jazz Nights", roomtype: "private" },
-  //   { id: "3", name: "Classical Sundays", roomtype: "public" },
-  //   { id: "4", name: "Pop Playlist", roomtype: "public" },
-  //   { id: "5", name: "Indie Jams", roomtype: "private" },
-  // ];
-
-  // Dummy data for Trending Rooms
   const trendingRooms: Room[] = [
     { id: "6", name: "Pop Hits 2024", roomtype: "public", userCount: 156 },
     { id: "7", name: "Indie Discoveries", roomtype: "public", userCount: 89 },

@@ -27,9 +27,10 @@ import { useSession } from "next-auth/react";
 export function CreateRoomModal() {
   const [roomName, setRoomName] = useState("");
   const [roomType, setRoomType] = useState<RoomType>(RoomType.public);
-  const session = useSession();
+  const { data: session, status } = useSession();
   //@ts-ignore
-  const userId = session.data?.user.id;
+  const userId = session?.user.id;
+  console.log(userId);
 
   const router = useRouter();
   const handleCreateRoom = async () => {

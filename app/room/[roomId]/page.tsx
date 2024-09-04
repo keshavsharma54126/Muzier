@@ -121,7 +121,7 @@ export default function RoomPage() {
           )}
         </div>
       </div>
-      <div className="text-white lg:mb-24">Hello user</div>
+      <div className="text-white ">Hello user</div>
     </div>
   );
 }

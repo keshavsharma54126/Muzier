@@ -11,7 +11,7 @@ import {
 import { ChevronDownIcon, CopyIcon } from "@radix-ui/react-icons";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import { useToast } from "@/hooks/use-toast";
+import { UseToast } from "@/hooks/use-toast";
 import { MdMeetingRoom } from "react-icons/md";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -50,7 +50,7 @@ export default function RoomPage() {
 
   const copyRoomCode = () => {
     navigator.clipboard.writeText(roomData.code);
-    const { toast } = useToast();
+    const { toast } = UseToast();
     toast({
       description: "Room code copied to clipboard",
     });

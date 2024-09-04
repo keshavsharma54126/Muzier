@@ -66,14 +66,11 @@ export default function RoomPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {roomData.roomtype === "private" && roomData.userId != userId && (
-        <EnterRoomModal />
-      )}
+    <div className="container mx-auto px-4 py-8 my-12">
       {(roomData.roomtype !== "private" ||
         roomData.userId === userId ||
         !isModalOpen) && (
-        <div className="text-white my-12">
+        <div className="text-white ">
           <h1 className="text-3xl font-bold mb-6">{roomData.name}</h1>
           <p className="mb-4">Room Type: {roomData.roomtype}</p>
           <p className="mb-4">Room Code: {roomData.code}</p>
@@ -86,6 +83,7 @@ export default function RoomPage() {
           {/* Add more room features here */}
         </div>
       )}
+      <div className="text-white">hello user</div>
     </div>
   );
 }

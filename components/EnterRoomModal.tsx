@@ -11,12 +11,15 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { MdLogin } from "react-icons/md";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export function EnterRoomModal() {
   const [roomCode, setRoomCode] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -24,7 +27,16 @@ export function EnterRoomModal() {
       setError("Room code is required");
       return;
     }
-    // Add your room entry logic here
+    try {
+      const res = await axios.post("/api/enterRoom", {
+        roomCode,
+      });
+      console.log(res.data);
+      router.push(`/room/${res.data.roomId}`);
+    } catch (e) {
+      console.error("error while entering room", e);
+      setError("error while entering room");
+    }
   };
 
   return (

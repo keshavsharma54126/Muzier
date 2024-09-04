@@ -3,9 +3,17 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronDownIcon, CopyIcon } from "@radix-ui/react-icons";
 import axios from "axios";
-import { EnterRoomModal } from "@/components/EnterRoomModal";
 import { useSession } from "next-auth/react";
+import { useToast } from "@/hooks/use-toast";
+import { MdMeetingRoom } from "react-icons/md";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function RoomPage() {
   const { roomId } = useParams();
@@ -40,21 +48,12 @@ export default function RoomPage() {
     fetchRoomData();
   }, [roomId]);
 
-  const handleEnterRoom = async (code: string) => {
-    try {
-      const response = await axios.post(`/api/verifyRoomCode`, {
-        roomId,
-        code,
-      });
-      if (response.data.success) {
-        setIsModalOpen(false);
-      } else {
-        // Handle incorrect code
-        console.error("Incorrect room code");
-      }
-    } catch (error) {
-      console.error("Error verifying room code:", error);
-    }
+  const copyRoomCode = () => {
+    navigator.clipboard.writeText(roomData.code);
+    const { toast } = useToast();
+    toast({
+      description: "Room code copied to clipboard",
+    });
   };
 
   if (loading) {
@@ -66,24 +65,63 @@ export default function RoomPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 my-12">
-      {(roomData.roomtype !== "private" ||
-        roomData.userId === userId ||
-        !isModalOpen) && (
-        <div className="text-white ">
-          <h1 className="text-3xl font-bold mb-6">{roomData.name}</h1>
-          <p className="mb-4">Room Type: {roomData.roomtype}</p>
-          <p className="mb-4">Room Code: {roomData.code}</p>
-          <div className="flex space-x-4">
-            <Button>Start Streaming</Button>
-            <Button variant="outline" className="text-black">
-              Invite Friends
-            </Button>
-          </div>
-          {/* Add more room features here */}
+    <div className="container mx-auto px-4 py-24">
+      <div className="flex flex-col lg:flex-row lg:justify-end">
+        <div className="lg:w-1/3 w-full">
+          {(roomData.roomtype !== "private" ||
+            roomData.userId === userId ||
+            !isModalOpen) && (
+            <Card className="bg-gradient-to-br from-purple-950 to-indigo-950 border-purple-800 text-white shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold flex items-center">
+                  <MdMeetingRoom className="mr-2 text-purple-400" />{" "}
+                  {roomData.name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Collapsible className="space-y-2">
+                  <CollapsibleTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-between p-0 h-9 text-white hover:bg-purple-800/30">
+                      <span>Room Information</span>
+                      <ChevronDownIcon className="h-4 w-4 shrink-0 transition-transform duration-200" />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-2">
+                    <div className="text-sm">
+                      Room Type: {roomData.roomtype}
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span>Room Code: {roomData.code}</span>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={copyRoomCode}
+                        className="h-8 w-8 text-white hover:bg-purple-800/30">
+                        <CopyIcon className="h-4 w-4" />
+                        <span className="sr-only">Copy</span>
+                      </Button>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <div className="flex flex-col space-y-2 mt-4">
+                  <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                    Start Streaming
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full border-purple-600 text-white hover:bg-purple-800/30">
+                    Invite Friends
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
-      )}
-      <div className="text-white">hello user</div>
+      </div>
+      <div className="text-white lg:mb-24">Hello user</div>
     </div>
   );
 }

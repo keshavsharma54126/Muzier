@@ -5,6 +5,8 @@ import * as React from "react";
 
 import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
 
+import { useState, useEffect } from "react";
+
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
 
@@ -168,10 +170,10 @@ function toast({ ...props }: Toast) {
   };
 }
 
-function UseToast() {
-  const [state, setState] = React.useState<State>(memoryState);
+function useToast() {
+  const [state, setState] = useState<State>(() => memoryState);
 
-  React.useEffect(() => {
+  useEffect(() => {
     listeners.push(setState);
     return () => {
       const index = listeners.indexOf(setState);
@@ -179,7 +181,7 @@ function UseToast() {
         listeners.splice(index, 1);
       }
     };
-  }, [state]);
+  }, []);
 
   return {
     ...state,
@@ -188,4 +190,4 @@ function UseToast() {
   };
 }
 
-export { UseToast, toast };
+export { useToast, toast };

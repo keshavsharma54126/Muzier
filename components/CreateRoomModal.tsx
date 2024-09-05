@@ -30,7 +30,6 @@ export function CreateRoomModal() {
   const { data: session, status } = useSession();
   //@ts-ignore
   const userId = session?.user.id;
-  console.log(userId);
 
   const router = useRouter();
   const handleCreateRoom = async () => {

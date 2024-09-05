@@ -1,12 +1,12 @@
 "use client";
 
-import { UseToast } from "@/hooks/use-toast";
 import { Toast } from "@/components/ui/toast";
 import { Provider } from "@radix-ui/react-toast";
 import { AnimatePresence, motion } from "framer-motion";
+import { useToast } from "./use-toast";
 
 export function Toaster() {
-  const { toasts } = UseToast();
+  const { toasts } = useToast();
 
   return (
     <Provider>

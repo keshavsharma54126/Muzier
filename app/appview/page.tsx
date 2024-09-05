@@ -6,12 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { FaMusic, FaUsers, FaDoorOpen, FaFire } from "react-icons/fa";
-import {
-  MdLibraryMusic,
-  MdGroupAdd,
-  MdLogin,
-  MdMeetingRoom,
-} from "react-icons/md";
+import { MdLibraryMusic, MdMeetingRoom } from "react-icons/md";
 import { CreateRoomModal } from "@/components/CreateRoomModal";
 import { Button } from "@/components/ui/button";
 import axios from "axios";

@@ -5,7 +5,7 @@ import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { useState } from "react";
+import { SocketProvider } from "@/components/socket-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 

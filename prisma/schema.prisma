@@ -20,6 +20,7 @@ model User {
   name          String?
   imageUrl      String?
   streams       Stream[]
+  songs         Song[]
   upvotes       Upvote[]
 }
 
@@ -30,21 +31,33 @@ model Stream{
   roomtype      RoomType    
   type          StreamType?
   active        Boolean?         @default(true)
-  upvotes       Upvote[]
+  songs         Song[]
   userId        String
   user          User            @relation(fields: [userId],references: [id])
   createdAt     DateTime        @default(now())
   updatedAt     DateTime?       
 }
 
+model Song{
+  id        String            @id @default(uuid())
+  name      String
+  url       String
+  upvotes   Upvote[]
+  streamId  String           
+  stream    Stream            @relation(fields: [streamId],references: [id])
+  userId    String
+  user      User              @relation(fields: [userId],references: [id])
+}
+
 model Upvote{
   id            String          @id @default(uuid())
   userId        String
-  streamId      String
+  songId        String
   user          User            @relation(fields: [userId],references: [id])
-  stream        Stream          @relation(fields: [streamId],references: [id])
+  song          Song          @relation(fields: [songId],references: [id])
 
 }
+
 
 
 

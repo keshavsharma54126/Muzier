@@ -106,10 +106,10 @@ export default function RoomPage() {
     );
 
   return (
-    <div className="mt-12 text-gray-200 flex flex-col lg:flex-row min-h-screen bg-gradient-to-br from-gray-900 to-black ">
+    <div className=" text-gray-200 flex flex-col lg:flex-row min-h-screen bg-gradient-to-br from-gray-900 to-black mt-16 ">
       <div className="flex-grow lg:w-4/5 xl:w-5/6 p-4 sm:p-6 md:p-8 lg:p-10">
         <div className="flex flex-col lg:flex-row gap-6 justify-center">
-          <div className="w-full lg:w-2/5 space-y-4">
+          <div className="w-full lg:w-2/5  space-y-6">
             <Card className="bg-gray-800/80 backdrop-blur-sm border-gray-700 shadow-lg">
               <CardHeader className="p-4">
                 <CardTitle className="text-xl font-bold text-purple-300">
@@ -137,7 +137,7 @@ export default function RoomPage() {
               </CardContent>
             </Card>
           </div>
-          <div className="w-full lg:w-2/5">
+          <div className="w-full lg:w-3/5">
             <Card className="bg-gray-800/80 backdrop-blur-sm border-gray-700 shadow-lg h-full">
               <CardHeader className="p-4">
                 <CardTitle className="text-xl font-bold text-purple-300 flex items-center">
@@ -145,7 +145,7 @@ export default function RoomPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
-                <ScrollArea className="h-[650px] w-full rounded-md">
+                <ScrollArea className="h-[800px] w-full rounded-md">
                   <div className="space-y-3">
                     {songs.map((song) => (
                       <Card
@@ -269,7 +269,7 @@ export default function RoomPage() {
             </CardContent>
           </Card>
         )}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center space-x-2 bg-gray-800/80 px-4 py-2 rounded-full">
             <FaUsers className="text-purple-300" />
             <span>Online: {viewers}</span>

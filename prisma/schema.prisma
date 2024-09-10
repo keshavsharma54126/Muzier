@@ -22,7 +22,6 @@ model User {
   streams       Stream[]
   songs         Song[]
   upvotes       Upvote[]
-  downvotes     Downvote[]
 }
 
 model Stream{
@@ -45,27 +44,24 @@ model Song{
   url       String
   thumbnail  String
   upvotes   Upvote[]
-  downvotes  Downvote[]
   streamId  String           
   stream    Stream            @relation(fields: [streamId],references: [id])
   userId    String
   user      User              @relation(fields: [userId],references: [id])
+  createdAt  DateTime         @default(now())
 }
 
 model Upvote{
   id            String          @id @default(uuid())
-  songId        String
-  userId        String
+  songId        String          @unique
+  userId        String          @unique
+  upvoted        Boolean        @default(false)
+  downvoted      Boolean        @default(false)
   user          User            @relation(fields: [userId],references: [id])
   song          Song          @relation(fields: [songId],references: [id])
+  createdAt     DateTime      @default(now())
 }
-model Downvote{
- id            String          @id @default(uuid())
-  songId        String
-  userId        String
-  user          User            @relation(fields: [userId],references: [id])
-  song          Song          @relation(fields: [songId],references: [id])
-}
+
 
 
 

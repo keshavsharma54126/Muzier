@@ -4,16 +4,16 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const { roomId } = await req.json();
-    const res = await db.stream.findMany({
+    const songs = await db.song.findMany({
       where: {
-        id: roomId,
+        streamId: roomId,
       },
-      select: {
-        songs: true,
+      include: {
+        upvotes: true,
       },
     });
-    const songs = res[0].songs;
     console.log(songs);
+
     return NextResponse.json({ songs }, { status: 200 });
   } catch (e) {
     return NextResponse.json(

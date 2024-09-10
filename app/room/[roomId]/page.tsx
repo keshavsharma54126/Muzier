@@ -33,8 +33,7 @@ interface songInterface {
   name: string;
   url: string;
   thumbnail: string;
-  upvote: number;
-  downvote: number;
+  upvotes: any;
   streamId: string;
   userId: string;
 }
@@ -51,22 +50,92 @@ export default function RoomPage() {
   const userId = session?.user?.id;
 
   const [songs, setSongs] = useState<songInterface[] | null>(null);
+  const handleUpvote = async (songId: string) => {
+    try {
+      setSongs((prevSongs) =>
+        //@ts-ignore
+        prevSongs.map((song) => {
+          if (song.id === songId) {
+            // Check if the user has already downvoted
+            const existingVote = song.upvotes.find(
+              (up: any) => up.userId === userId
+            );
 
-  const handleVote = (songId: string, upvoted: number, downvoted: number) => {
-    setSongs((prevSongs) =>
-      prevSongs
-        ? prevSongs.map((song) => {
-            if (song.id === songId) {
-              return {
-                ...song,
-                upvote: song.upvote + upvoted,
-                downvote: song.downvote + downvoted,
-              };
+            // Create a new upvotes array
+            const updatedUpvotes = song.upvotes.filter(
+              (up: any) => up.userId !== userId
+            ); // Remove existing vote
+
+            if (existingVote) {
+              // If the user had downvoted, remove the downvote and add the upvote
+              if (existingVote.downvoted) {
+                updatedUpvotes.push({
+                  userId,
+                  songId,
+                  upvoted: true,
+                  downvoted: false,
+                }); // Add new upvote
+              }
+              // If the user had upvoted, remove the upvote (toggle)
+            } else {
+              // If the user has not voted yet, just add the upvote
+              updatedUpvotes.push({
+                userId,
+                songId,
+                upvoted: true,
+                downvoted: false,
+              });
             }
-            return song;
-          })
-        : []
+
+            return { ...song, upvotes: updatedUpvotes }; // Update song with new upvotes
+          }
+          return song; // Return unchanged song
+        })
+      );
+      await axios.post("/api/upvote", {
+        userId,
+        songId,
+      });
+    } catch (e) {
+      console.error("error while updating upvotes", e);
+    }
+  };
+
+  const handleDownvote = async (songId: string) => {
+    setSongs((prevSongs) =>
+      //@ts-ignore
+      prevSongs.map((song) => {
+        if (song.id === songId) {
+          // Check if the user has already upvoted
+          const existingVote = song.upvotes.find(
+            (up: any) => up.userId === userId
+          );
+
+          // Create a new upvotes array
+          const updatedUpvotes = song.upvotes.filter(
+            (up: any) => up.userId !== userId
+          ); // Remove existing vote
+
+          if (existingVote) {
+            // If the user had upvoted, remove the upvote and add the downvote
+            if (existingVote.upvoted) {
+              updatedUpvotes.push({ userId, upvoted: false, downvoted: true }); // Add new downvote
+            }
+            // If the user had downvoted, remove the downvote (toggle)
+          } else {
+            // If the user has not voted yet, just add the downvote
+            updatedUpvotes.push({ userId, upvoted: false, downvoted: true });
+          }
+
+          return { ...song, upvotes: updatedUpvotes }; // Update song with new upvotes
+        }
+        return song; // Return unchanged song
+      })
     );
+    await axios.post("/api/downvote", {
+      userId,
+      songId,
+    });
   };
 
   useEffect(() => {
@@ -78,6 +147,7 @@ export default function RoomPage() {
         const res = await axios.post("/api/getStreamSongs", {
           roomId,
         });
+        console.log(res.data.songs);
         setSongs(res.data.songs);
       } catch (error) {
         console.error("Error fetching room data:", error);
@@ -185,9 +255,12 @@ export default function RoomPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => handleVote(song.id, 1, 0)}
+                                onClick={() => handleUpvote(song.id)}
                                 className={`p-4 ${
-                                  song.upvote === 1
+                                  song.upvotes.some(
+                                    (up: any) =>
+                                      up.userId === userId && up.upvoted
+                                  )
                                     ? "text-green-400"
                                     : "text-gray-400 hover:text-green-400"
                                 } hover:bg-gray-600/50`}>
@@ -195,20 +268,40 @@ export default function RoomPage() {
                               </Button>
                               <span
                                 className={`font-bold text-2xl ${
-                                  song.upvote - song.downvote > 0
+                                  song.upvotes.filter((up: any) => {
+                                    return up.upvoted === true;
+                                  }).length -
+                                    song.upvotes.filter((up: any) => {
+                                      return up.downvoted === true;
+                                    }).length >
+                                  0
                                     ? "text-black"
-                                    : song.upvote - song.downvote < 0
+                                    : song.upvotes.filter((up: any) => {
+                                        return up.upvoted === true;
+                                      }).length -
+                                        song.upvotes.filter((up: any) => {
+                                          return up.downvoted === true;
+                                        }).length <
+                                      0
                                     ? "text-black"
                                     : "text-purple-500"
                                 }`}>
-                                {song.upvote - song.downvote}
+                                {song.upvotes.filter((up: any) => {
+                                  return up.upvoted === true;
+                                }).length -
+                                  song.upvotes.filter((up: any) => {
+                                    return up.downvoted === true;
+                                  }).length}
                               </span>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => handleVote(song.id, 0, 1)}
+                                onClick={() => handleDownvote(song.id)}
                                 className={`p-1 ${
-                                  song.upvote === -1
+                                  song.upvotes.some(
+                                    (up: any) =>
+                                      up.userId === userId && up.downvoted
+                                  )
                                     ? "text-blue-500"
                                     : "text-gray-400 hover:text-blue-500"
                                 } hover:bg-gray-600/50`}>

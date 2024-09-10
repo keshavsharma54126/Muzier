@@ -56,7 +56,57 @@ export default function RoomPage() {
         //@ts-ignore
         prevSongs.map((song) => {
           if (song.id === songId) {
-            // Check if the user has already downvoted
+            const existingVote = song.upvotes.find(
+              (up: any) => up.userId === userId
+            );
+            const updatedUpvotes = song.upvotes.filter(
+              (up: any) => up.userId !== userId
+            );
+
+            if (existingVote) {
+              if (existingVote.downvoted) {
+                updatedUpvotes.push({
+                  userId,
+                  songId,
+                  upvoted: true,
+                  downvoted: false,
+                });
+              }
+            } else {
+              updatedUpvotes.push({
+                userId,
+                songId,
+                upvoted: true,
+                downvoted: false,
+              });
+            }
+
+            return { ...song, upvotes: updatedUpvotes };
+          }
+          return song;
+        })
+      );
+
+      const response = await axios.post("/api/upvote", {
+        userId,
+        songId,
+      });
+
+      if (response.status !== 200) {
+        console.error("Failed to upvote:", response.data);
+      }
+    } catch (e) {
+      console.error("Error while updating upvotes:", e);
+    }
+  };
+
+  const handleDownvote = async (songId: string) => {
+    try {
+      setSongs((prevSongs) =>
+        //@ts-ignore
+        prevSongs.map((song) => {
+          if (song.id === songId) {
+            // Check if the user has already upvoted
             const existingVote = song.upvotes.find(
               (up: any) => up.userId === userId
             );
@@ -67,24 +117,18 @@ export default function RoomPage() {
             ); // Remove existing vote
 
             if (existingVote) {
-              // If the user had downvoted, remove the downvote and add the upvote
+              // If the user had upvoted, remove the upvote and add the downvote
               if (existingVote.downvoted) {
                 updatedUpvotes.push({
                   userId,
-                  songId,
-                  upvoted: true,
-                  downvoted: false,
-                }); // Add new upvote
+                  upvoted: false,
+                  downvoted: true,
+                }); // Add new downvote
               }
-              // If the user had upvoted, remove the upvote (toggle)
+              // If the user had downvoted, remove the downvote (toggle)
             } else {
-              // If the user has not voted yet, just add the upvote
-              updatedUpvotes.push({
-                userId,
-                songId,
-                upvoted: true,
-                downvoted: false,
-              });
+              // If the user has not voted yet, just add the downvote
+              updatedUpvotes.push({ userId, upvoted: false, downvoted: true });
             }
 
             return { ...song, upvotes: updatedUpvotes }; // Update song with new upvotes
@@ -92,50 +136,13 @@ export default function RoomPage() {
           return song; // Return unchanged song
         })
       );
-      await axios.post("/api/upvote", {
+      await axios.post("/api/downvote", {
         userId,
         songId,
       });
     } catch (e) {
-      console.error("error while updating upvotes", e);
+      console.error("erro while downvoting the song", e);
     }
-  };
-
-  const handleDownvote = async (songId: string) => {
-    setSongs((prevSongs) =>
-      //@ts-ignore
-      prevSongs.map((song) => {
-        if (song.id === songId) {
-          // Check if the user has already upvoted
-          const existingVote = song.upvotes.find(
-            (up: any) => up.userId === userId
-          );
-
-          // Create a new upvotes array
-          const updatedUpvotes = song.upvotes.filter(
-            (up: any) => up.userId !== userId
-          ); // Remove existing vote
-
-          if (existingVote) {
-            // If the user had upvoted, remove the upvote and add the downvote
-            if (existingVote.upvoted) {
-              updatedUpvotes.push({ userId, upvoted: false, downvoted: true }); // Add new downvote
-            }
-            // If the user had downvoted, remove the downvote (toggle)
-          } else {
-            // If the user has not voted yet, just add the downvote
-            updatedUpvotes.push({ userId, upvoted: false, downvoted: true });
-          }
-
-          return { ...song, upvotes: updatedUpvotes }; // Update song with new upvotes
-        }
-        return song; // Return unchanged song
-      })
-    );
-    await axios.post("/api/downvote", {
-      userId,
-      songId,
-    });
   };
 
   useEffect(() => {
@@ -257,7 +264,7 @@ export default function RoomPage() {
                                 size="sm"
                                 onClick={() => handleUpvote(song.id)}
                                 className={`p-4 ${
-                                  song.upvotes.some(
+                                  song?.upvotes?.some(
                                     (up: any) =>
                                       up.userId === userId && up.upvoted
                                   )
@@ -268,37 +275,37 @@ export default function RoomPage() {
                               </Button>
                               <span
                                 className={`font-bold text-2xl ${
-                                  song.upvotes.filter((up: any) => {
+                                  song.upvotes?.filter((up: any) => {
                                     return up.upvoted === true;
                                   }).length -
-                                    song.upvotes.filter((up: any) => {
+                                    song.upvotes?.filter((up: any) => {
                                       return up.downvoted === true;
                                     }).length >
                                   0
                                     ? "text-black"
-                                    : song.upvotes.filter((up: any) => {
+                                    : song.upvotes?.filter((up: any) => {
                                         return up.upvoted === true;
                                       }).length -
-                                        song.upvotes.filter((up: any) => {
+                                        song.upvotes?.filter((up: any) => {
                                           return up.downvoted === true;
                                         }).length <
                                       0
                                     ? "text-black"
                                     : "text-purple-500"
                                 }`}>
-                                {song.upvotes.filter((up: any) => {
+                                {song.upvotes?.filter((up: any) => {
                                   return up.upvoted === true;
                                 }).length -
-                                  song.upvotes.filter((up: any) => {
+                                  song.upvotes?.filter((up: any) => {
                                     return up.downvoted === true;
-                                  }).length}
+                                  }).length || 0}
                               </span>
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleDownvote(song.id)}
                                 className={`p-1 ${
-                                  song.upvotes.some(
+                                  song.upvotes?.some(
                                     (up: any) =>
                                       up.userId === userId && up.downvoted
                                   )

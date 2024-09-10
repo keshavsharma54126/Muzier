@@ -23,8 +23,8 @@ export async function POST(req: NextRequest) {
           songId,
         },
         data: {
-          upvoted: !existingUpvote.upvoted,
-          downvoted: existingUpvote.downvoted,
+          upvoted: existingUpvote.upvoted,
+          downvoted: !existingUpvote.downvoted,
         },
       });
     } else {
@@ -32,8 +32,8 @@ export async function POST(req: NextRequest) {
         data: {
           userId,
           songId,
-          upvoted: true,
-          downvoted: false,
+          upvoted: false,
+          downvoted: true,
         },
       });
     }
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     );
   } catch (e) {
     return NextResponse.json(
-      { message: "error while upvotintg the song" },
+      { message: "error while downvoting the song" },
       { status: 400 }
     );
   }

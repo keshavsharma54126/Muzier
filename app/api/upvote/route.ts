@@ -17,16 +17,28 @@ export async function POST(req: NextRequest) {
       },
     });
     if (existingUpvote) {
-      await db.upvote.update({
-        where: {
-          userId,
-          songId,
-        },
-        data: {
-          upvoted: !existingUpvote.upvoted,
-          downvoted: existingUpvote.downvoted,
-        },
-      });
+      if (existingUpvote.downvoted) {
+        await db.upvote.update({
+          where: {
+            userId,
+            songId,
+          },
+          data: {
+            upvoted: !existingUpvote.upvoted,
+            downvoted: !existingUpvote.downvoted,
+          },
+        });
+      } else {
+        await db.upvote.update({
+          where: {
+            userId,
+            songId,
+          },
+          data: {
+            upvoted: !existingUpvote.upvoted,
+          },
+        });
+      }
     } else {
       await db.upvote.create({
         data: {

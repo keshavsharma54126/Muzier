@@ -56,16 +56,16 @@ export default function RoomPage() {
         //@ts-ignore
         prevSongs.map((song) => {
           if (song.id === songId) {
-            const existingVote = song.upvotes.find(
+            const existingVote = song.upvotes?.find(
               (up: any) => up.userId === userId
             );
-            const updatedUpvotes = song.upvotes.filter(
+            const updatedUpvotes = song.upvotes?.filter(
               (up: any) => up.userId !== userId
             );
 
             if (existingVote) {
               if (existingVote.downvoted) {
-                updatedUpvotes.push({
+                updatedUpvotes?.push({
                   userId,
                   songId,
                   upvoted: true,
@@ -73,7 +73,7 @@ export default function RoomPage() {
                 });
               }
             } else {
-              updatedUpvotes.push({
+              updatedUpvotes?.push({
                 userId,
                 songId,
                 upvoted: true,
@@ -107,23 +107,31 @@ export default function RoomPage() {
         prevSongs.map((song) => {
           if (song.id === songId) {
             // Check if the user has already upvoted
-            const existingVote = song.upvotes.find(
+            const existingVote = song.upvotes?.find(
               (up: any) => up.userId === userId
             );
 
             // Create a new upvotes array
-            const updatedUpvotes = song.upvotes.filter(
+            const updatedUpvotes = song.upvotes?.filter(
               (up: any) => up.userId !== userId
             ); // Remove existing vote
 
             if (existingVote) {
               // If the user had upvoted, remove the upvote and add the downvote
-              if (existingVote.downvoted) {
+              if (existingVote?.upvoted) {
                 updatedUpvotes.push({
                   userId,
+                  songId,
                   upvoted: false,
                   downvoted: true,
                 }); // Add new downvote
+              } else {
+                updatedUpvotes?.push({
+                  userId,
+                  songId,
+                  upvoted: false,
+                  downvoted: false,
+                });
               }
               // If the user had downvoted, remove the downvote (toggle)
             } else {

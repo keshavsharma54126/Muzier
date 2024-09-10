@@ -24,7 +24,7 @@ model User {
   upvotes       Upvote[]
 }
 
-model Stream{
+model Stream {
   id            String          @id @default(uuid())
   name          String
   code          String         @unique
@@ -33,32 +33,32 @@ model Stream{
   active        Boolean?         @default(true)
   songs         Song[]
   userId        String
-  user          User            @relation(fields: [userId],references: [id])
+  user          User            @relation(fields: [userId], references: [id])
   createdAt     DateTime        @default(now())
   updatedAt     DateTime?       
 }
 
-model Song{
+model Song {
   id        String            @id @default(uuid())
   name      String
   url       String
-  thumbnail  String
-  upvotes   Upvote[]
+  thumbnail String
+  upvotes   Upvote[]        
   streamId  String           
-  stream    Stream            @relation(fields: [streamId],references: [id])
+  stream    Stream            @relation(fields: [streamId], references: [id])
   userId    String
-  user      User              @relation(fields: [userId],references: [id])
+  user      User              @relation(fields: [userId], references: [id])
   createdAt  DateTime         @default(now())
 }
 
-model Upvote{
+model Upvote {
   id            String          @id @default(uuid())
-  songId        String          @unique
-  userId        String          @unique
+  songId        String          @unique     
+  userId        String          
   upvoted        Boolean        @default(false)
   downvoted      Boolean        @default(false)
-  user          User            @relation(fields: [userId],references: [id])
-  song          Song          @relation(fields: [songId],references: [id])
+  user          User            @relation(fields: [userId], references: [id])
+  song          Song            @relation(fields: [songId], references: [id], onDelete: Cascade) // Enable cascade delete
   createdAt     DateTime      @default(now())
 }
 

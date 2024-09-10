@@ -40,13 +40,21 @@ export async function POST(req: NextRequest) {
     const title = res.data.items[0].snippet.title;
     const thumbnail = res.data.items[0].snippet.thumbnails.default.url;
 
-    await db.song.create({
+    const song = await db.song.create({
       data: {
         name: title,
         url,
         thumbnail,
         streamId: roomId,
         userId,
+      },
+    });
+    await db.upvote.create({
+      data: {
+        userId,
+        songId: song.id,
+        upvoted: false,
+        downvoted: false,
       },
     });
 

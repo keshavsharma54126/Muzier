@@ -10,23 +10,33 @@ export async function POST(req: NextRequest) {
     }
     const { userId, songId }: { userId: string; songId: string } =
       await req.json(); // Added await
-    const existingUpvote = await db.upvote.findUnique({
+    const existingUpvote = await db.upvote.findFirst({
       where: {
         userId,
         songId,
       },
     });
     if (existingUpvote) {
-      await db.upvote.update({
-        where: {
-          userId,
-          songId,
-        },
-        data: {
-          upvoted: existingUpvote.upvoted,
-          downvoted: !existingUpvote.downvoted,
-        },
-      });
+      if (existingUpvote.upvoted) {
+        await db.upvote.update({
+          where: {
+            songId,
+          },
+          data: {
+            downvoted: !existingUpvote.downvoted,
+            upvoted: !existingUpvote.upvoted,
+          },
+        });
+      } else if (existingUpvote.downvoted) {
+        await db.upvote.update({
+          where: {
+            songId,
+          },
+          data: {
+            downvoted: !existingUpvote.downvoted,
+          },
+        });
+      }
     } else {
       await db.upvote.create({
         data: {

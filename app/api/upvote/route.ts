@@ -20,7 +20,6 @@ export async function POST(req: NextRequest) {
       if (existingUpvote.downvoted) {
         await db.upvote.update({
           where: {
-            userId,
             songId,
           },
           data: {
@@ -31,7 +30,6 @@ export async function POST(req: NextRequest) {
       } else {
         await db.upvote.update({
           where: {
-            userId,
             songId,
           },
           data: {

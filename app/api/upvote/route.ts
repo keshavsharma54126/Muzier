@@ -8,36 +8,44 @@ export async function POST(req: NextRequest) {
     if (!session?.user) {
       return NextResponse.json({ message: "user not signed" }, { status: 400 });
     }
+
     const { userId, songId }: { userId: string; songId: string } =
-      await req.json(); // Added await
-    const existingUpvote = await db.upvote.findUnique({
+      await req.json();
+
+    // Check if the user has already voted on this song
+    const existingVote = await db.upvote.findUnique({
       where: {
-        userId,
-        songId,
+        userId_songId: {
+          userId,
+          songId,
+        },
       },
     });
-    if (existingUpvote) {
-      if (existingUpvote.downvoted) {
+
+    if (existingVote) {
+      // If the user has already upvoted, toggle the upvote
+      if (existingVote.downvoted) {
         await db.upvote.update({
           where: {
-            songId,
+            id: existingVote.id, // Use the unique ID of the existing vote
           },
           data: {
-            upvoted: !existingUpvote.upvoted,
-            downvoted: !existingUpvote.downvoted,
+            upvoted: true,
+            downvoted: false,
           },
         });
       } else {
         await db.upvote.update({
           where: {
-            songId,
+            id: existingVote.id,
           },
           data: {
-            upvoted: !existingUpvote.upvoted,
+            upvoted: !existingVote.upvoted, // Toggle upvoted state
           },
         });
       }
     } else {
+      // If no existing vote, create a new upvote
       await db.upvote.create({
         data: {
           userId,
@@ -47,11 +55,13 @@ export async function POST(req: NextRequest) {
         },
       });
     }
+
     return NextResponse.json(
       { message: "upvote added successfully" },
       { status: 200 }
     );
   } catch (e) {
+    console.error("Error while upvoting the song:", e);
     return NextResponse.json(
       { message: "error while upvotintg the song" },
       { status: 400 }

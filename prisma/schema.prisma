@@ -53,13 +53,14 @@ model Song {
 
 model Upvote {
   id            String          @id @default(uuid())
-  songId        String          @unique     
-  userId        String          
+  songId        String             
+  userId        String         
   upvoted       Boolean         @default(false)
   downvoted     Boolean         @default(false)
   user          User            @relation(fields: [userId], references: [id])
   song          Song            @relation(fields: [songId], references: [id], onDelete: Cascade) // Enable cascade delete
   createdAt     DateTime      @default(now())
+    @@unique([userId, songId]) 
 }
 
 

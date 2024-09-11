@@ -4,10 +4,10 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { PlusCircle, Music } from "lucide-react";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 
 const InputComponent = ({
   roomId,
-  userId,
   setSongs,
 }: {
   roomId: string;
@@ -15,6 +15,9 @@ const InputComponent = ({
   setSongs: React.Dispatch<React.SetStateAction<any[]>>;
 }) => {
   const [url, setUrl] = useState("");
+  const { data: session } = useSession();
+  //@ts-ignore
+  const userId = session?.user?.id;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUrl(e.target.value);
@@ -63,6 +66,7 @@ const InputComponent = ({
         roomId,
         userId,
       });
+      console.log(res.data);
       addSong();
       setUrl("");
     } catch (e) {

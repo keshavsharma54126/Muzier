@@ -27,6 +27,7 @@ import Image from "next/image"; // Ensure this import is present
 import InputComponent from "@/components/InputComponent";
 import PlayerComponent from "@/components/PlayerComponent";
 import axios from "axios";
+import SongComponent from "@/components/Song";
 
 interface songInterface {
   id: string;
@@ -50,127 +51,28 @@ export default function RoomPage() {
   const userId = session?.user?.id;
 
   const [songs, setSongs] = useState<songInterface[] | null>(null);
-  const handleUpvote = async (songId: string) => {
+
+  const fetchRoomData = async () => {
     try {
-      setSongs((prevSongs) =>
-        //@ts-ignore
-        prevSongs.map((song) => {
-          if (song.id === songId) {
-            const existingVote = song.upvotes?.find(
-              (up: any) => up.userId === userId
-            );
-            const updatedUpvotes = song.upvotes?.filter(
-              (up: any) => up.userId !== userId
-            );
-
-            if (existingVote) {
-              if (existingVote.downvoted) {
-                updatedUpvotes?.push({
-                  userId,
-                  songId,
-                  upvoted: true,
-                  downvoted: false,
-                });
-              }
-            } else {
-              updatedUpvotes?.push({
-                userId,
-                songId,
-                upvoted: true,
-                downvoted: false,
-              });
-            }
-
-            return { ...song, upvotes: updatedUpvotes };
-          }
-          return song;
-        })
-      );
-
-      const response = await axios.post("/api/upvote", {
-        userId,
-        songId,
+      const response = await fetch(`/api/getRoomData?roomId=${roomId}`);
+      const data = await response.json();
+      setRoomData(data);
+      const res = await axios.post("/api/getStreamSongs", {
+        roomId,
       });
-
-      if (response.status !== 200) {
-        console.error("Failed to upvote:", response.data);
-      }
-    } catch (e) {
-      console.error("Error while updating upvotes:", e);
-    }
-  };
-
-  const handleDownvote = async (songId: string) => {
-    try {
-      setSongs((prevSongs) =>
-        //@ts-ignore
-        prevSongs.map((song) => {
-          if (song.id === songId) {
-            // Check if the user has already upvoted
-            const existingVote = song.upvotes?.find(
-              (up: any) => up.userId === userId
-            );
-
-            // Create a new upvotes array
-            const updatedUpvotes = song.upvotes?.filter(
-              (up: any) => up.userId !== userId
-            ); // Remove existing vote
-
-            if (existingVote) {
-              // If the user had upvoted, remove the upvote and add the downvote
-              if (existingVote?.upvoted) {
-                updatedUpvotes.push({
-                  userId,
-                  songId,
-                  upvoted: false,
-                  downvoted: true,
-                }); // Add new downvote
-              } else {
-                updatedUpvotes?.push({
-                  userId,
-                  songId,
-                  upvoted: false,
-                  downvoted: false,
-                });
-              }
-              // If the user had downvoted, remove the downvote (toggle)
-            } else {
-              // If the user has not voted yet, just add the downvote
-              updatedUpvotes.push({ userId, upvoted: false, downvoted: true });
-            }
-
-            return { ...song, upvotes: updatedUpvotes }; // Update song with new upvotes
-          }
-          return song; // Return unchanged song
-        })
-      );
-      await axios.post("/api/downvote", {
-        userId,
-        songId,
-      });
-    } catch (e) {
-      console.error("erro while downvoting the song", e);
+      console.log(res.data.songs);
+      setSongs(res.data.songs);
+    } catch (error) {
+      console.error("Error fetching room data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    const fetchRoomData = async () => {
-      try {
-        const response = await fetch(`/api/getRoomData?roomId=${roomId}`);
-        const data = await response.json();
-        setRoomData(data);
-        const res = await axios.post("/api/getStreamSongs", {
-          roomId,
-        });
-        console.log(res.data.songs);
-        setSongs(res.data.songs);
-      } catch (error) {
-        console.error("Error fetching room data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchRoomData();
+    const interval = setInterval(fetchRoomData, 5000);
+    return () => clearInterval(interval);
   }, [roomId]);
 
   const copyRoomCode = () => {
@@ -178,22 +80,6 @@ export default function RoomPage() {
       navigator.clipboard.writeText(roomData.code);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
-    }
-  };
-
-  const handleDelete = async (songId: string) => {
-    try {
-      const response = await axios.delete(`/api/deleteSong?songId=${songId}`);
-      if (response.status === 200) {
-        setSongs((prevSongs) =>
-          prevSongs ? prevSongs.filter((song) => song.id !== songId) : []
-        );
-      }
-    } catch (e: any) {
-      console.error(
-        "Error while deleting song:",
-        e.response?.data || e.message
-      );
     }
   };
 
@@ -261,124 +147,12 @@ export default function RoomPage() {
                 <ScrollArea className="h-[800px] w-full rounded-md">
                   <div className="space-y-3">
                     {songs?.map((song) => (
-                      <Card
-                        key={song.id}
-                        className=" text-black bg-purple-200 backdrop-blur-sm border-purple-600 hover:bg-white transition-colors duration-200 hover:text-white">
-                        <CardContent className="p-3 text-white">
-                          <div className="flex items-center">
-                            <div className="flex flex-col items-center mr-3">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleUpvote(song.id)}
-                                className={`p-4 ${
-                                  song?.upvotes?.some(
-                                    (up: any) =>
-                                      up.userId === userId && up.upvoted
-                                  )
-                                    ? "text-green-400"
-                                    : "text-gray-400 hover:text-green-400"
-                                } hover:bg-gray-600/50`}>
-                                <FaArrowUp className="h-8 w-8" />
-                              </Button>
-                              <span
-                                className={`font-bold text-2xl ${
-                                  song.upvotes?.filter((up: any) => {
-                                    return up.upvoted === true;
-                                  }).length -
-                                    song.upvotes?.filter((up: any) => {
-                                      return up.downvoted === true;
-                                    }).length >
-                                  0
-                                    ? "text-black"
-                                    : song.upvotes?.filter((up: any) => {
-                                        return up.upvoted === true;
-                                      }).length -
-                                        song.upvotes?.filter((up: any) => {
-                                          return up.downvoted === true;
-                                        }).length <
-                                      0
-                                    ? "text-black"
-                                    : "text-purple-500"
-                                }`}>
-                                {song.upvotes?.filter((up: any) => {
-                                  return up.upvoted === true;
-                                }).length -
-                                  song.upvotes?.filter((up: any) => {
-                                    return up.downvoted === true;
-                                  }).length || 0}
-                              </span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleDownvote(song.id)}
-                                className={`p-1 ${
-                                  song.upvotes?.some(
-                                    (up: any) =>
-                                      up.userId === userId && up.downvoted
-                                  )
-                                    ? "text-blue-500"
-                                    : "text-gray-400 hover:text-blue-500"
-                                } hover:bg-gray-600/50`}>
-                                <FaArrowDown className="h-8 w-8" />
-                              </Button>
-                            </div>
-                            <div className="flex flex-row gap-4">
-                              <div>
-                                <Image
-                                  src={song.thumbnail}
-                                  alt={song.name}
-                                  width={150}
-                                  height={100}
-                                />
-                              </div>
-                              <h1 className="font-semibold text-black text-xl">
-                                {song.name}
-                              </h1>
-                            </div>
-                            {roomData.userId === userId && (
-                              <div className="flex flex-row ml-10">
-                                <Button
-                                  variant="ghost"
-                                  className="text-gray-400 hover:text-green-300 hover:bg-gray-600/50 text-xs">
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.5"
-                                    stroke="currentColor"
-                                    className="size-10 text-green-400">
-                                    <path
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
-                                    />
-                                  </svg>
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  onClick={(e) => {
-                                    handleDelete(song.id);
-                                  }}>
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.5"
-                                    stroke="currentColor"
-                                    className="size-10 text-red-700">
-                                    <path
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                                    />
-                                  </svg>
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
+                      <SongComponent
+                        song={song}
+                        roomData={roomData}
+                        userId={userId}
+                        setSongs={setSongs}
+                      />
                     ))}
                   </div>
                 </ScrollArea>
@@ -387,7 +161,7 @@ export default function RoomPage() {
           </div>
         </div>
       </div>
-      <div className="lg:w-1/5 xl:w-1/6 p-4 sm:p-6 md:p-8 lg:p-10 ">
+      <div className="lg:w-1/5 xl:w-1/6 p-4 sm:p-6 md:p-8 lg:p-10 m ">
         {(roomData.roomtype !== "private" || roomData.userId === userId) && (
           <Card className="bg-gray-800/80 backdrop-blur-sm border-gray-700 shadow-lg text-gray-200 sticky top-10">
             <CardHeader>

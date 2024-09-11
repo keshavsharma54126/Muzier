@@ -8,5 +8,5 @@ export default function RoomLayout({
   children: React.ReactNode;
   params: { roomId: string };
 }) {
-  return <SocketProvider roomId={params.roomId}>{children}</SocketProvider>;
+  return <div>{children}</div>;
 }

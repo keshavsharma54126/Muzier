@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useSocket } from "@/components/socket-provider";
@@ -39,6 +39,7 @@ export default function RoomPage() {
   const [isCopied, setIsCopied] = useState(false);
   const { data: session } = useSession();
   const { socket, isConnected, viewers } = useSocket();
+  const [url, setUrl] = useState("");
   //@ts-ignore
   const userId = session?.user?.id;
 
@@ -75,8 +76,33 @@ export default function RoomPage() {
     }
   };
 
-  const handlePlayNext = () => {
-    console.log("Playing next song");
+  const handlePlayNext = async () => {
+    let max = -100000;
+    let maxIndex = 0;
+    const songList =
+      songs?.map(
+        (song: any) =>
+          song.upvotes.filter((sg: any) => sg.upvoted === true).length -
+          song.upvotes.filter((sg: any) => sg.downvoted === true).length
+      ) || []; // Added default empty array to avoid undefined error
+    for (let i = 0; i < songList.length; i++) {
+      if (songList[i] > max) {
+        max = songList[i];
+        maxIndex = i;
+      }
+    }
+    //@ts-ignore
+    const nextSongUrl = songs[maxIndex]?.url;
+    //@ts-ignore
+    const songId = songs[maxIndex]?.id;
+    console.log(songId);
+    if (nextSongUrl) {
+      setUrl(nextSongUrl);
+      songs?.splice(maxIndex, 1);
+      await axios.delete(`/api/deleteSong?songId=${songId}`);
+    } else {
+      console.error("No valid song URL found.");
+    }
   };
 
   if (loading)
@@ -107,7 +133,7 @@ export default function RoomPage() {
                 <InputComponent
                   roomId={roomId}
                   userId={userId}
-                  setSongs={setSongs as any} // Cast to the correct type
+                  setSongs={setSongs as any}
                 />
               </CardContent>
             </Card>
@@ -118,9 +144,9 @@ export default function RoomPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
-                <PlayerComponent url="https://www.youtube.com/watch?v=GhH1QWY6BDc&t=4389s" />
+                <PlayerComponent url={url} />
                 <Button
-                  onClick={handlePlayNext}
+                  onClick={() => handlePlayNext()}
                   className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-gray-100 font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out flex items-center justify-center text-sm shadow-md">
                   <FaStepForward className="mr-2" />
                   Play Next

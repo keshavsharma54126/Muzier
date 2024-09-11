@@ -1,15 +1,25 @@
-import React, { useState, useEffect } from "react";
-import ReactPlayer from "react-player";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import React, { useState, useEffect, useRef } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Music, Video } from "lucide-react";
+import ReactPlayer from "react-player";
 
 interface PlayerComponentProps {
   url: string;
 }
 
+declare global {
+  interface Window {
+    onYouTubeIframeAPIReady: () => void;
+    YT: any;
+  }
+}
+
 const PlayerComponent: React.FC<PlayerComponentProps> = ({ url }) => {
   const [isYouTube, setIsYouTube] = useState(false);
   const [isSpotify, setIsSpotify] = useState(false);
+  const playerRef = useRef<HTMLDivElement>(null);
+  const [playerReady, setPlayerReady] = useState(false);
+  const [songs, setSongs] = useState<string[]>([url]); // Assuming you have a list of songs
 
   useEffect(() => {
     if (url.includes("youtube.com") || url.includes("youtu.be")) {
@@ -24,22 +34,52 @@ const PlayerComponent: React.FC<PlayerComponentProps> = ({ url }) => {
     }
   }, [url]);
 
+  useEffect(() => {
+    if (isYouTube && !playerReady) {
+      const script = document.createElement("script");
+      script.src = "https://www.youtube.com/iframe_api";
+      script.async = true;
+      document.body.appendChild(script);
+
+      window.onYouTubeIframeAPIReady = () => {
+        setPlayerReady(true);
+      };
+
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, [isYouTube, playerReady]);
+
+  useEffect(() => {
+    if (isYouTube && playerReady && playerRef.current) {
+      new window.YT.Player(playerRef.current, {
+        videoId: getYoutubeId(url),
+        height: "260",
+        width: "500",
+        playerVars: {
+          autoplay: 1,
+          controls: 1,
+        },
+      });
+    }
+  }, [isYouTube, playerReady, url]);
+
+  const getYoutubeId = (url: string) => {
+    const regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+
+  const removeSong = (song: string) => {
+    setSongs((prevSongs) => prevSongs.filter((s) => s !== song));
+  };
+
   const renderPlayer = () => {
     if (isYouTube) {
       return (
-        <div className="aspect-w-16 aspect-h-9 w-full">
-          <ReactPlayer
-            url={url}
-            controls
-            width="100%"
-            height="100%"
-            config={{
-              youtube: {
-                playerVars: { modestbranding: 1 },
-              },
-            }}
-          />
-        </div>
+        <div ref={playerRef} className="aspect-w-16 aspect-h-9 w-full"></div>
       );
     } else if (isSpotify) {
       const trackId = url.split("/").pop()?.split("?")[0];
@@ -58,9 +98,15 @@ const PlayerComponent: React.FC<PlayerComponentProps> = ({ url }) => {
       );
     } else {
       return (
-        <p className="text-white text-center text-xs sm:text-sm md:text-base lg:text-lg p-2 sm:p-3 md:p-4 lg:p-5">
-          Invalid URL. Please enter a valid YouTube or Spotify URL.
-        </p>
+        <ReactPlayer
+          url={url}
+          width="100%"
+          height="100%"
+          controls={true}
+          playerVars={{ origin: window.location.origin, autoplay: 1 }}
+          className="rounded-lg"
+          onEnded={() => removeSong(url)} // Remove the song when it ends
+        />
       );
     }
   };

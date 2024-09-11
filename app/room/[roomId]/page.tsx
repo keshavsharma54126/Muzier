@@ -14,15 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronDownIcon, CopyIcon, CheckIcon } from "@radix-ui/react-icons";
 import { MdMeetingRoom } from "react-icons/md";
-import {
-  FaUsers,
-  FaWifi,
-  FaMusic,
-  FaStepForward,
-  FaArrowUp,
-  FaArrowDown,
-} from "react-icons/fa";
-import Image from "next/image"; // Ensure this import is present
+import { FaUsers, FaWifi, FaMusic, FaStepForward } from "react-icons/fa";
 
 import InputComponent from "@/components/InputComponent";
 import PlayerComponent from "@/components/PlayerComponent";
@@ -148,6 +140,7 @@ export default function RoomPage() {
                   <div className="space-y-3">
                     {songs?.map((song) => (
                       <SongComponent
+                        key={song.id}
                         song={song}
                         roomData={roomData}
                         userId={userId}

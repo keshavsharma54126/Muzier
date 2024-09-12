@@ -39,13 +39,13 @@ export default function RoomPage() {
   const [isCopied, setIsCopied] = useState(false);
   const { data: session } = useSession();
   const { socket, isConnected, viewers } = useSocket();
-  const [url, setUrl] = useState("");
+
   //@ts-ignore
   const userId = session?.user?.id;
 
   const [songs, setSongs] = useState<songInterface[] | null>(null);
 
-  const fetchRoomData = async () => {
+  const fetchRoomData = useCallback(async () => {
     try {
       const response = await fetch(`/api/getRoomData?roomId=${roomId}`);
       const data = await response.json();
@@ -60,48 +60,19 @@ export default function RoomPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [roomId]);
 
   useEffect(() => {
     fetchRoomData();
     const interval = setInterval(fetchRoomData, 5000);
     return () => clearInterval(interval);
-  }, [roomId]);
+  }, [fetchRoomData]);
 
   const copyRoomCode = () => {
     if (roomData && roomData.code) {
       navigator.clipboard.writeText(roomData.code);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
-    }
-  };
-
-  const handlePlayNext = async () => {
-    let max = -100000;
-    let maxIndex = 0;
-    const songList =
-      songs?.map(
-        (song: any) =>
-          song.upvotes.filter((sg: any) => sg.upvoted === true).length -
-          song.upvotes.filter((sg: any) => sg.downvoted === true).length
-      ) || []; // Added default empty array to avoid undefined error
-    for (let i = 0; i < songList.length; i++) {
-      if (songList[i] > max) {
-        max = songList[i];
-        maxIndex = i;
-      }
-    }
-    //@ts-ignore
-    const nextSongUrl = songs[maxIndex]?.url;
-    //@ts-ignore
-    const songId = songs[maxIndex]?.id;
-    console.log(songId);
-    if (nextSongUrl) {
-      setUrl(nextSongUrl);
-      songs?.splice(maxIndex, 1);
-      await axios.delete(`/api/deleteSong?songId=${songId}`);
-    } else {
-      console.error("No valid song URL found.");
     }
   };
 
@@ -119,7 +90,7 @@ export default function RoomPage() {
     );
 
   return (
-    <div className=" text-gray-200 flex flex-col lg:flex-row min-h-screen bg-gradient-to-br from-gray-900 to-black mt-16 ">
+    <div className="text-gray-200 flex flex-col lg:flex-row min-h-screen bg-gradient-to-br from-gray-900 to-black mt-16 ">
       <div className="flex-grow lg:w-4/5 xl:w-5/6 p-4 sm:p-6 md:p-8 lg:p-10">
         <div className="flex flex-col lg:flex-row gap-6 justify-center">
           <div className="w-full lg:w-2/5  space-y-6">
@@ -144,13 +115,7 @@ export default function RoomPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
-                <PlayerComponent url={url} />
-                <Button
-                  onClick={() => handlePlayNext()}
-                  className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-gray-100 font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out flex items-center justify-center text-sm shadow-md">
-                  <FaStepForward className="mr-2" />
-                  Play Next
-                </Button>
+                <PlayerComponent roomId={roomId} />
               </CardContent>
             </Card>
           </div>

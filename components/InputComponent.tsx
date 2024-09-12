@@ -70,6 +70,7 @@ const InputComponent = ({
       addSong();
       setUrl("");
     } catch (e) {
+      alert("can not add a duplicate entry");
       console.error("error while adding song", e);
     }
   };

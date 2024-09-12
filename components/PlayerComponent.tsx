@@ -1,134 +1,141 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import YouTube from "react-youtube";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Music, Video } from "lucide-react";
-import ReactPlayer from "react-player";
+import { Button } from "@/components/ui/button";
+import { FaStepForward } from "react-icons/fa";
+import axios from "axios";
 
 interface PlayerComponentProps {
+  roomId: string;
+}
+
+interface Song {
+  id: string;
   url: string;
+  upvotes: number;
+  downvotes: number;
 }
 
-declare global {
-  interface Window {
-    onYouTubeIframeAPIReady: () => void;
-    YT: any;
-  }
-}
+const PlayerComponent: React.FC<PlayerComponentProps> = ({ roomId }) => {
+  const [songs, setSongs] = useState<Song[]>([]);
+  const [currentVideoId, setCurrentVideoId] = useState<string | null>(null);
+  //@ts-ignore
+  const [player, setPlayer] = useState<YT.Player | null>(null);
 
-const PlayerComponent: React.FC<PlayerComponentProps> = ({ url }) => {
-  const [isYouTube, setIsYouTube] = useState(false);
-  const [isSpotify, setIsSpotify] = useState(false);
-  const playerRef = useRef<HTMLDivElement>(null);
-  const [playerReady, setPlayerReady] = useState(false);
-  const [songs, setSongs] = useState<string[]>([url]); // Assuming you have a list of songs
+  const getNextSong = useCallback((): Song | null => {
+    if (songs.length === 0) return null;
 
-  useEffect(() => {
-    if (url.includes("youtube.com") || url.includes("youtu.be")) {
-      setIsYouTube(true);
-      setIsSpotify(false);
-    } else if (url.includes("spotify.com")) {
-      setIsYouTube(false);
-      setIsSpotify(true);
-    } else {
-      setIsYouTube(false);
-      setIsSpotify(false);
-    }
-  }, [url]);
+    // Sort songs by upvotes - downvotes, in descending order
+    const sortedSongs = [...songs].sort(
+      (a, b) => b.upvotes - b.downvotes - (a.upvotes - a.downvotes)
+    );
 
-  useEffect(() => {
-    if (isYouTube && !playerReady) {
-      const script = document.createElement("script");
-      script.src = "https://www.youtube.com/iframe_api";
-      script.async = true;
-      document.body.appendChild(script);
+    return sortedSongs[0];
+  }, [songs]);
 
-      window.onYouTubeIframeAPIReady = () => {
-        setPlayerReady(true);
-      };
-
-      return () => {
-        document.body.removeChild(script);
-      };
-    }
-  }, [isYouTube, playerReady]);
-
-  useEffect(() => {
-    if (isYouTube && playerReady && playerRef.current) {
-      new window.YT.Player(playerRef.current, {
-        videoId: getYoutubeId(url),
-        height: "260",
-        width: "500",
-        playerVars: {
-          autoplay: 1,
-          controls: 1,
-        },
-      });
-    }
-  }, [isYouTube, playerReady, url]);
-
-  const getYoutubeId = (url: string) => {
+  const extractVideoId = (url: string): string | null => {
     const regExp =
       /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     return match && match[2].length === 11 ? match[2] : null;
   };
 
-  const removeSong = (song: string) => {
-    setSongs((prevSongs) => prevSongs.filter((s) => s !== song));
+  const playNextSong = useCallback(async () => {
+    const nextSong = getNextSong();
+
+    if (nextSong) {
+      const videoId = extractVideoId(nextSong.url);
+      if (videoId) {
+        setCurrentVideoId(videoId);
+        // Remove the played song from the list
+        setSongs((prevSongs) =>
+          prevSongs.filter((song) => song.id !== nextSong.id)
+        );
+        await axios.delete(`/api/deleteSong?songId=${nextSong.id}`);
+      } else {
+        console.error("Invalid YouTube URL:", nextSong.url);
+        // Skip this song and try the next one
+        setSongs((prevSongs) =>
+          prevSongs.filter((song) => song.id !== nextSong.id)
+        );
+        playNextSong();
+      }
+    } else {
+      console.log("No more songs to play");
+      setCurrentVideoId(null);
+    }
+  }, [getNextSong]);
+
+  useEffect(() => {
+    const fetchSongs = async () => {
+      try {
+        const res = await axios.post<{ songs: Song[] }>("/api/getStreamSongs", {
+          roomId,
+        });
+        console.log(res.data.songs);
+        setSongs(res.data.songs);
+      } catch (error) {
+        console.error("Error fetching room data:", error);
+      }
+    };
+
+    const intervalId = setInterval(fetchSongs, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [roomId]);
+
+  useEffect(() => {
+    if (!currentVideoId) {
+      playNextSong();
+    }
+  }, [currentVideoId, playNextSong, songs]);
+  //@ts-ignore
+  const onReady = (event: YT.PlayerEvent) => {
+    setPlayer(event.target);
   };
 
-  const renderPlayer = () => {
-    if (isYouTube) {
-      return (
-        <div ref={playerRef} className="aspect-w-16 aspect-h-9 w-full"></div>
-      );
-    } else if (isSpotify) {
-      const trackId = url.split("/").pop()?.split("?")[0];
-      return (
-        <div className="w-full h-20 sm:h-24 md:h-28 lg:h-32">
-          <iframe
-            src={`https://open.spotify.com/embed/track/${trackId}`}
-            width="100%"
-            height="100%"
-            frameBorder="0"
-            allowTransparency={true}
-            allow="encrypted-media"
-            className="rounded-lg"
-          />
-        </div>
-      );
-    } else {
-      return (
-        <ReactPlayer
-          url={url}
-          width="100%"
-          height="100%"
-          controls={true}
-          playerVars={{ origin: window.location.origin, autoplay: 1 }}
-          className="rounded-lg"
-          onEnded={() => removeSong(url)} // Remove the song when it ends
-        />
-      );
-    }
+  const onEnd = () => {
+    playNextSong();
+  };
+  //@ts-ignore
+  const onError = (event: YT.OnErrorEvent) => {
+    console.error("YouTube player error:", event.data);
+    playNextSong();
+  };
+  //@ts-ignore
+  const opts: YT.PlayerOptions = {
+    height: "390",
+    width: "100%",
+    playerVars: {
+      autoplay: 1,
+    },
   };
 
   return (
     <Card className="w-full bg-gradient-to-br from-purple-900 to-indigo-900 shadow-xl overflow-hidden">
       <CardHeader className="p-2 sm:p-3 md:p-4 lg:p-5">
-        <CardTitle className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white flex items-center">
-          {isYouTube ? (
-            <Video className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
-          ) : (
-            <Music className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 lg:h-7 lg:w-7" />
-          )}
-          {isYouTube
-            ? "YouTube Player"
-            : isSpotify
-            ? "Spotify Player"
-            : "Media Player"}
+        <CardTitle className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white flex items-center justify-between">
+          <div className="flex items-center">YouTube Player</div>
+          <Button
+            onClick={playNextSong}
+            className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-gray-100 font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out flex items-center justify-center text-sm shadow-md">
+            <FaStepForward className="mr-2" />
+            Play Next
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-2 sm:p-3 md:p-4 lg:p-5">
-        {renderPlayer()}
+        {currentVideoId ? (
+          <YouTube
+            videoId={currentVideoId}
+            opts={opts}
+            onReady={onReady}
+            onEnd={onEnd}
+            onError={onError}
+          />
+        ) : (
+          <p>No video is currently playing.</p>
+        )}
       </CardContent>
     </Card>
   );

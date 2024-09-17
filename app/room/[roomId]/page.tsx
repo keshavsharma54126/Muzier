@@ -45,6 +45,10 @@ export default function RoomPage() {
 
   const [songs, setSongs] = useState<songInterface[] | null>(null);
 
+  const sortSongs = () => {
+    songs?.sort((a, b) => b.upvotes);
+  };
+
   const fetchRoomData = useCallback(async () => {
     try {
       const response = await fetch(`/api/getRoomData?roomId=${roomId}`);
@@ -55,6 +59,7 @@ export default function RoomPage() {
       });
       console.log(res.data.songs);
       setSongs(res.data.songs);
+      // sortSongs(songs)
     } catch (error) {
       console.error("Error fetching room data:", error);
     } finally {

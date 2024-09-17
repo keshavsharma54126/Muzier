@@ -12,8 +12,7 @@ interface PlayerComponentProps {
 interface Song {
   id: string;
   url: string;
-  upvotes: number;
-  downvotes: number;
+  upvotes: any;
 }
 
 const PlayerComponent: React.FC<PlayerComponentProps> = ({ roomId }) => {
@@ -26,8 +25,18 @@ const PlayerComponent: React.FC<PlayerComponentProps> = ({ roomId }) => {
     if (songs.length === 0) return null;
 
     const sortedSongs = [...songs].sort(
-      (a, b) => b.upvotes - b.downvotes - (a.upvotes - a.downvotes)
+      (a, b) =>
+        b.upvotes.filter((u: any) => u.songId === b.id && u.upvoted === true)
+          .length -
+        b.upvotes.filter((u: any) => u.songId === b.id && u.downvoted === true)
+          .length -
+        (a.upvotes.filter((u: any) => u.songId === a.id && u.upvoted === true)
+          .length -
+          a.upvotes.filter(
+            (u: any) => u.songId === a.id && u.downvoted === true
+          ).length)
     );
+    console.log(songs);
 
     return sortedSongs[0];
   }, [songs]);

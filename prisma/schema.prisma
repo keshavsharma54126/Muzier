@@ -41,7 +41,7 @@ model Stream {
 model Song {
   id        String            @id @default(uuid())
   name      String
-  url       String            @unique
+  url       String            
   thumbnail String
   upvotes   Upvote[]        
   streamId  String           

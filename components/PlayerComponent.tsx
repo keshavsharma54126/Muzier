@@ -25,7 +25,6 @@ const PlayerComponent: React.FC<PlayerComponentProps> = ({ roomId }) => {
   const getNextSong = useCallback((): Song | null => {
     if (songs.length === 0) return null;
 
-    // Sort songs by upvotes - downvotes, in descending order
     const sortedSongs = [...songs].sort(
       (a, b) => b.upvotes - b.downvotes - (a.upvotes - a.downvotes)
     );
@@ -47,18 +46,16 @@ const PlayerComponent: React.FC<PlayerComponentProps> = ({ roomId }) => {
       const videoId = extractVideoId(nextSong.url);
       if (videoId) {
         setCurrentVideoId(videoId);
-        // Remove the played song from the list
         setSongs((prevSongs) =>
           prevSongs.filter((song) => song.id !== nextSong.id)
         );
         await axios.delete(`/api/deleteSong?songId=${nextSong.id}`);
       } else {
         console.error("Invalid YouTube URL:", nextSong.url);
-        // Skip this song and try the next one
         setSongs((prevSongs) =>
           prevSongs.filter((song) => song.id !== nextSong.id)
         );
-        playNextSong();
+        playNextSong(); // Ensure this is safe to call recursively
       }
     } else {
       console.log("No more songs to play");

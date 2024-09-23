@@ -45,10 +45,6 @@ export default function RoomPage() {
 
   const [songs, setSongs] = useState<songInterface[] | null>(null);
 
-  const sortSongs = () => {
-    songs?.sort((a, b) => b.upvotes);
-  };
-
   const fetchRoomData = useCallback(async () => {
     try {
       const response = await fetch(`/api/getRoomData?roomId=${roomId}`);
@@ -59,7 +55,6 @@ export default function RoomPage() {
       });
       console.log(res.data.songs);
       setSongs(res.data.songs);
-      // sortSongs(songs)
     } catch (error) {
       console.error("Error fetching room data:", error);
     } finally {
@@ -67,8 +62,19 @@ export default function RoomPage() {
     }
   }, [roomId]);
 
+  const sortSongs = () => {
+    return (songs ?? []).sort(
+      (a, b) =>
+        b.upvotes?.filter((u: any) => u.upvoted && !u.downvoted).length -
+        b.upvotes?.filter((u: any) => u.downvoted && !u.upvoted) -
+        (a.upvotes?.filter((u: any) => u.upvoted && !u.downvoted).length -
+          a.upvotes?.filter((u: any) => u.downvoted && !u.upvoted))
+    );
+  };
+
   useEffect(() => {
     fetchRoomData();
+    sortSongs();
     const interval = setInterval(fetchRoomData, 5000);
     return () => clearInterval(interval);
   }, [fetchRoomData]);
@@ -134,7 +140,7 @@ export default function RoomPage() {
               <CardContent className="p-4">
                 <ScrollArea className="h-[800px] w-full rounded-md">
                   <div className="space-y-3">
-                    {songs?.map((song) => (
+                    {sortSongs().map((song) => (
                       <SongComponent
                         key={song.id}
                         song={song}
@@ -164,7 +170,8 @@ export default function RoomPage() {
                 <CollapsibleTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="w-full justify-between p-2 text-gray-300 hover:bg-white rounded-md">
+                    className="w-full justify-between p-2 text-gray-300 hover:bg-white rounded-md"
+                  >
                     <span>Room Information</span>
                     <ChevronDownIcon className="h-4 w-4 shrink-0 transition-transform duration-200" />
                   </Button>
@@ -181,7 +188,8 @@ export default function RoomPage() {
                       size="icon"
                       variant="ghost"
                       onClick={copyRoomCode}
-                      className="h-8 w-8 text-white-400 hover:bg-white-600/50">
+                      className="h-8 w-8 text-white-400 hover:bg-white-600/50"
+                    >
                       {isCopied ? (
                         <CheckIcon className="h-4 w-4 text-green-500" />
                       ) : (

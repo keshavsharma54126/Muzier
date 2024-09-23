@@ -96,7 +96,8 @@ const InputComponent = ({
           />
           <Button
             onClick={handleAddSong}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 sm:py-2.5 md:py-3 lg:py-3.5 px-3 sm:px-4 md:px-5 lg:px-6 rounded-full transition duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center text-xs sm:text-sm md:text-base lg:text-lg h-9 sm:h-10 md:h-11 lg:h-12">
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 sm:py-2.5 md:py-3 lg:py-3.5 px-3 sm:px-4 md:px-5 lg:px-6 rounded-full transition duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center text-xs sm:text-sm md:text-base lg:text-lg h-9 sm:h-10 md:h-11 lg:h-12"
+          >
             <PlusCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 lg:h-6 lg:w-6" />
             Add Song
           </Button>

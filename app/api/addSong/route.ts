@@ -1,3 +1,4 @@
+import { authOptions } from "@/lib/auth";
 import db from "@/lib/db";
 import axios from "axios";
 import { getServerSession } from "next-auth";
@@ -5,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json(
         { message: "user not signed in" },
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
     const { url, roomId, userId } = await req.json();
     const urlObj = new URL(url);
     const videoId = urlObj.searchParams.get("v");
-    const apiKey = process.env.NEXT_YOUTUBE_APIKEY;
+    const apiKey = "AIzaSyBenioWr6YeAI54CBT3lMjf-kK__3ahOfo";
 
     // Check if videoId is valid
     if (!videoId) {
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
     const res = await axios.get(
       `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoId}&key=${apiKey}`
     );
-
+    console.log(res.data);
     // Check if the response contains items
     if (!res.data.items.length) {
       return NextResponse.json(

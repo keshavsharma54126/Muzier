@@ -53,7 +53,7 @@ export default function RoomPage() {
       const res = await axios.post("/api/getStreamSongs", {
         roomId,
       });
-      console.log(res.data.songs);
+
       setSongs(res.data.songs);
     } catch (error) {
       console.error("Error fetching room data:", error);

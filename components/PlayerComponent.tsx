@@ -41,11 +41,33 @@ const PlayerComponent: React.FC<PlayerComponentProps> = ({ roomId }) => {
     return sortedSongs[0];
   }, [songs]);
 
-  const extractVideoId = (url: string): string | null => {
-    const regExp =
-      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    return match && match[2].length === 11 ? match[2] : null;
+  const extractVideoId = (url: string) => {
+    try {
+      const urlObj = new URL(url);
+      if (
+        [
+          "youtube.com",
+          "www.youtube.com",
+          "m.youtube.com",
+          "youtu.be",
+        ].includes(urlObj.hostname)
+      ) {
+        if (urlObj.searchParams.has("v")) {
+          console.log(urlObj.searchParams.get("v"));
+          return urlObj.searchParams.get("v");
+        }
+        if (urlObj.hostname.includes("youtu.be")) {
+          console.log(urlObj.pathname.split("/")[1]);
+          return urlObj.pathname.split("/")[1];
+        }
+        if (urlObj.pathname.startsWith("/watch?v=")) {
+          console.log(urlObj.pathname.split("/")[2]);
+          return urlObj.pathname.split("/")[2];
+        }
+      }
+    } catch (error) {
+      console.error("Error extracting video ID:", error);
+    }
   };
 
   const playNextSong = useCallback(async () => {
@@ -67,7 +89,6 @@ const PlayerComponent: React.FC<PlayerComponentProps> = ({ roomId }) => {
         playNextSong(); // Ensure this is safe to call recursively
       }
     } else {
-      console.log("No more songs to play");
       setCurrentVideoId(null);
     }
   }, [getNextSong]);
@@ -124,7 +145,8 @@ const PlayerComponent: React.FC<PlayerComponentProps> = ({ roomId }) => {
           <div className="flex items-center">YouTube Player</div>
           <Button
             onClick={playNextSong}
-            className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-gray-100 font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out flex items-center justify-center text-sm shadow-md">
+            className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-gray-100 font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out flex items-center justify-center text-sm shadow-md"
+          >
             <FaStepForward className="mr-2" />
             Play Next
           </Button>

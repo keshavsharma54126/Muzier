@@ -155,7 +155,7 @@ const InputComponent = ({
             Add Song
           </Button>
         </div>
-        <div className="flex flex-col space-y-2 sm:space-y-3 md:space-y-4 mt-4">
+        {/* <div className="flex flex-col space-y-2 sm:space-y-3 md:space-y-4 mt-4">
           <Input
             type="text"
             placeholder="Search for a song"
@@ -178,7 +178,7 @@ const InputComponent = ({
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   );
